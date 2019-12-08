@@ -1,0 +1,30 @@
+{
+  "name": "hs-booking",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:hsoumi-tech/hs-booking.git",
+  "author": "Mahdi Hsoumi",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "serve": "FORCE_COLOR=3 nf start"
+  },
+  "devDependencies": {
+    "foreman": "^3.0.1",
+    "nodemon": "^2.0.1"
+  },
+  "dependencies": {
+    "esm": "^3.2.25",
+    "fastify": "^2.10.0",
+    "fastify-blipp": "^2.1.0",
+    "fastify-helmet": "^3.0.2",
+    "fastify-jwt": "^1.2.0",
+    "fastify-multipart": "^1.0.3",
+    "fastify-rate-limit": "^3.0.0",
+    "fastify-swagger": "^2.5.0",
+    "mongoose": "^5.7.14",
+    "pino": "^5.14.0",
+    "pino-pretty": "^3.5.0",
+    "url-parse": "^1.4.7"
+  }
+}

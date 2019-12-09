@@ -1,0 +1,12 @@
+{
+  "extends": ["airbnb-base", "prettier", "plugin:jest/recommended"],
+  "plugins": ["prettier", "jest"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "radix": ["error", "as-needed"],
+    "no-restricted-syntax": ["error", "BinaryExpression[operator='of']"],
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "import/extensions": "off",
+    "no-plusplus": "off"
+  }
+}

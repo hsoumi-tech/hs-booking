@@ -177,6 +177,7 @@ export const getAllRooms = () => {
 };
 
 export const addRoom = async ({
+  hotel,
   roomType,
   beds,
   occupancy,
@@ -185,6 +186,19 @@ export const addRoom = async ({
   pricePerNight
 }) => {
 
+  if (mongoose.Types.ObjectId.isValid(hotel) === false) {
+    return {
+      code: 422,
+      message: 'invalid hotel id'
+    };
+  } else if (!await Hotel.findOne({
+      _id: hotel
+    })) {
+    return {
+      code: 404,
+      message: 'hotel not found'
+    };
+  }
 
   if (mongoose.Types.ObjectId.isValid(roomType) === false) {
     return {
@@ -218,6 +232,7 @@ export const addRoom = async ({
 
 
   return new Room({
+    hotel,
     roomType,
     beds,
     occupancy,
@@ -229,6 +244,7 @@ export const addRoom = async ({
 
 
 export const updateRoom = async ({
+  hotel,
   roomType,
   beds,
   occupancy,
@@ -250,6 +266,22 @@ export const updateRoom = async ({
   })
 
   if (room) {
+    if (hotel) {
+      if (mongoose.Types.ObjectId.isValid(hotel) === false) {
+        return {
+          code: 422,
+          message: 'invalid hotel id'
+        };
+      } else if (!await Hotel.findOne({
+          _id: hotel
+        })) {
+        return {
+          code: 404,
+          message: 'hotel not found'
+        };
+      }
+    }
+
     if (roomType) {
       if (mongoose.Types.ObjectId.isValid(roomType) === false) {
         return {
@@ -284,6 +316,7 @@ export const updateRoom = async ({
       });
     }
 
+    room.hotel = hotel ? hotel : room.hotel;
     room.roomType = roomType ? roomType : room.roomType;
     room.beds = beds ? beds : room.beds
     room.occupancy = occupancy ? occupancy : room.occupancy
@@ -336,33 +369,16 @@ export const getAllHotels = () => {
 export const addHotel = async ({
   name,
   description,
-  rooms,
   adress,
   phoneNumber
 }) => {
 
 
-  for (let i = 0; i < rooms.length; i++) {
-    if (mongoose.Types.ObjectId.isValid(rooms[i]) === false) {
-      return {
-        code: 422,
-        message: `invalid room id`
-      };
-    } else if (!await Room.findOne({
-        _id: rooms[i]
-      })) {
-      return {
-        code: 404,
-        message: 'room not found'
-      };
-    }
-  };
 
 
   return new Hotel({
     name,
     description,
-    rooms,
     adress,
     phoneNumber
   }).save()
@@ -372,7 +388,6 @@ export const addHotel = async ({
 export const updateHotel = async ({
   name,
   description,
-  rooms,
   adress,
   phoneNumber,
   id
@@ -390,30 +405,8 @@ export const updateHotel = async ({
   })
 
   if (hotel) {
-
-    if (rooms) {
-      for (let i = 0; i < rooms.length; i++) {
-        if (mongoose.Types.ObjectId.isValid(rooms[i]) === false) {
-          return {
-            code: 422,
-            message: `invalid room id`
-          };
-        } else if (!await Room.findOne({
-            _id: rooms[i]
-          })) {
-          return {
-            code: 404,
-            message: 'room not found'
-          };
-        }
-      };
-    }
-
-
-
     hotel.name = name ? name : hotel.name;
     hotel.description = description ? description : hotel.description
-    hotel.rooms = rooms ? rooms : hotel.rooms
     hotel.adress = adress ? adress : hotel.adress
     hotel.phoneNumber = phoneNumber ? phoneNumber : hotel.phoneNumber
 

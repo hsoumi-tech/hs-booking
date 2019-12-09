@@ -30,8 +30,11 @@ export default (fastify, opts, next) => {
   const addRoomSchema = {
     body: {
       type: 'object',
-      required: ['roomType', 'beds', 'occupancy', 'floorLevel', 'roomNumber', 'pricePerNight'],
+      required: ['hotel', 'roomType', 'beds', 'occupancy', 'floorLevel', 'roomNumber', 'pricePerNight'],
       properties: {
+        hotel: {
+          type: 'string'
+        },
         roomType: {
           type: 'string'
         },
@@ -76,6 +79,9 @@ export default (fastify, opts, next) => {
       required: [],
       properties: {
         properties: {
+          hotel: {
+            type: 'string'
+          },
           roomType: {
             type: 'string'
           },

@@ -11,10 +11,7 @@ const hotelSchema = new Schema({
     type: String,
     trim: true
   },
-  rooms: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Room'
-  }],
+
   adress: {
     type: String,
     trim: true

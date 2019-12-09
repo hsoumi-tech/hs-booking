@@ -22,6 +22,7 @@
     "fastify-multipart": "^1.0.3",
     "fastify-rate-limit": "^3.0.0",
     "fastify-swagger": "^2.5.0",
+    "moment": "^2.24.0",
     "mongoose": "^5.7.14",
     "pino": "^5.14.0",
     "pino-pretty": "^3.5.0",

@@ -7,26 +7,19 @@ import {
 } from '../../controllers/reservation';
 
 export default (fastify, opts, next) => {
-
   // get all services
-  fastify.get(
-    '/service',
-    async () => {
-      const result = await getAllServices();
-      return result;
-    }
-  );
+  fastify.get('/', async () => {
+    const result = await getAllServices();
+    return result;
+  });
 
   // get service by id
-  fastify.get(
-    '/service/:id',
-    async req => {
-      const result = await getServiceById(req.params.id);
-      return result;
-    }
-  );
+  fastify.get('/:id', async req => {
+    const result = await getServiceById(req.params.id);
+    return result;
+  });
 
-  // add service 
+  // add service
   const addServiceSchema = {
     body: {
       type: 'object',
@@ -49,13 +42,14 @@ export default (fastify, opts, next) => {
         },
         hotel: {
           type: 'string'
-        },
+        }
       }
     }
   };
 
   fastify.post(
-    '/service', {
+    '/',
+    {
       schema: addServiceSchema
     },
     async req => {
@@ -64,7 +58,7 @@ export default (fastify, opts, next) => {
     }
   );
 
-  // update service 
+  // update service
   const updateServiceSchema = {
     body: {
       type: 'object',
@@ -87,30 +81,30 @@ export default (fastify, opts, next) => {
         },
         hotel: {
           type: 'string'
-        },
+        }
       }
     }
   };
 
   fastify.put(
-    '/service/:id', {
+    '/:id',
+    {
       schema: updateServiceSchema
     },
     async req => {
-      const result = await updateService(Object.assign({}, req.body, {
-        id: req.params.id
-      }));
+      const result = await updateService(
+        Object.assign({}, req.body, {
+          id: req.params.id
+        })
+      );
       return result;
     }
   );
 
-  // delete service 
-  fastify.delete(
-    '/service/:id',
-    async req => {
-      const result = await deleteService(req.params.id);
-      return result;
-    }
-  );
+  // delete service
+  fastify.delete('/:id', async req => {
+    const result = await deleteService(req.params.id);
+    return result;
+  });
   next();
 };

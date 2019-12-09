@@ -1,32 +1,19 @@
-import {
-  getAllBedTypes,
-  addBedType,
-  getBedTypeById,
-  updateBedType,
-  deleteBedType
-} from '../../controllers/hotel';
+import { getAllBedTypes, addBedType, getBedTypeById, updateBedType, deleteBedType } from '../../controllers/hotel';
 
 export default (fastify, opts, next) => {
-
-  // get all bed type 
-  fastify.get(
-    '/bed-type',
-    async () => {
-      const result = await getAllBedTypes();
-      return result;
-    }
-  );
+  // get all bed type
+  fastify.get('/', async () => {
+    const result = await getAllBedTypes();
+    return result;
+  });
 
   // get bed type by id
-  fastify.get(
-    '/bed-type/:id',
-    async req => {
-      const result = await getBedTypeById(req.params.id);
-      return result;
-    }
-  );
+  fastify.get('/:id', async req => {
+    const result = await getBedTypeById(req.params.id);
+    return result;
+  });
 
-  // add bed type 
+  // add bed type
   const addBedTypeSchema = {
     body: {
       type: 'object',
@@ -47,7 +34,8 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/bed-type', {
+    '/',
+    {
       schema: addBedTypeSchema
     },
     async req => {
@@ -56,7 +44,7 @@ export default (fastify, opts, next) => {
     }
   );
 
-  // update bed type 
+  // update bed type
   const updateBedTypeSchema = {
     body: {
       type: 'object',
@@ -77,24 +65,24 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/bed-type/:id', {
+    '/:id',
+    {
       schema: updateBedTypeSchema
     },
     async req => {
-      const result = await updateBedType(Object.assign({}, req.body, {
-        id: req.params.id
-      }));
+      const result = await updateBedType(
+        Object.assign({}, req.body, {
+          id: req.params.id
+        })
+      );
       return result;
     }
   );
 
-  // delete bed type 
-  fastify.delete(
-    '/bed-type/:id',
-    async req => {
-      const result = await deleteBedType(req.params.id);
-      return result;
-    }
-  );
+  // delete bed type
+  fastify.delete('/:id', async req => {
+    const result = await deleteBedType(req.params.id);
+    return result;
+  });
   next();
 };

@@ -7,26 +7,19 @@ import {
 } from '../../controllers/reservation';
 
 export default (fastify, opts, next) => {
-
   // get all Price Policies
-  fastify.get(
-    '/price-policy',
-    async () => {
-      const result = await getAllPricePolicies();
-      return result;
-    }
-  );
+  fastify.get('/', async () => {
+    const result = await getAllPricePolicies();
+    return result;
+  });
 
   // get price policy by id
-  fastify.get(
-    '/price-policy/:id',
-    async req => {
-      const result = await getPricePolicyById(req.params.id);
-      return result;
-    }
-  );
+  fastify.get('/:id', async req => {
+    const result = await getPricePolicyById(req.params.id);
+    return result;
+  });
 
-  // add price policy 
+  // add price policy
   const addPricePolicySchema = {
     body: {
       type: 'object',
@@ -36,7 +29,7 @@ export default (fastify, opts, next) => {
           type: 'string'
         },
         value: {
-          type: 'number',
+          type: 'number'
         },
         maximumPerson: {
           type: 'number',
@@ -55,13 +48,14 @@ export default (fastify, opts, next) => {
         },
         hotel: {
           type: 'string'
-        },
+        }
       }
     }
   };
 
   fastify.post(
-    '/price-policy', {
+    '/',
+    {
       schema: addPricePolicySchema
     },
     async req => {
@@ -70,7 +64,7 @@ export default (fastify, opts, next) => {
     }
   );
 
-  // update price policy 
+  // update price policy
   const updatePricePolicySchema = {
     body: {
       type: 'object',
@@ -80,7 +74,7 @@ export default (fastify, opts, next) => {
           type: 'string'
         },
         value: {
-          type: 'number',
+          type: 'number'
         },
         maximumPerson: {
           type: 'number',
@@ -99,33 +93,33 @@ export default (fastify, opts, next) => {
         },
         hotel: {
           type: 'string'
-        },
+        }
       }
     }
   };
 
   fastify.put(
-    '/price-policy/:id', {
+    '/:id',
+    {
       schema: updatePricePolicySchema
     },
     async req => {
       // const result = await updatePricePolicy(Object.assign({}, req.body, {
       //   id: req.params.id
       // }));
-      const result = await updatePricePolicy(Object.assign({}, req.body, {
-        id: req.params.id
-      }));
+      const result = await updatePricePolicy(
+        Object.assign({}, req.body, {
+          id: req.params.id
+        })
+      );
       return result;
     }
   );
 
-  // delete price policy 
-  fastify.delete(
-    '/price-policy/:id',
-    async req => {
-      const result = await deletePricePolicy(req.params.id);
-      return result;
-    }
-  );
+  // delete price policy
+  fastify.delete('/:id', async req => {
+    const result = await deletePricePolicy(req.params.id);
+    return result;
+  });
   next();
 };

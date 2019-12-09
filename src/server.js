@@ -1,26 +1,21 @@
-import Fastify from "fastify";
+import Fastify from 'fastify';
 
 // Plugins
-import fastifyHelmet from "fastify-helmet"; // https://github.com/fastify/fastify-helmet
-import fastifyJwt from "fastify-jwt"; // https://github.com/fastify/fastify-jwt
-import fastifyRateLimit from "fastify-rate-limit"; // https://github.com/fastify/fastify-rate-limit
-import fastifySwagger from "fastify-swagger"; // https://github.com/fastify/fastify-swagger
-import fastifyBlipp from "fastify-blipp"; // https://github.com/fastify/fastify-blipp
-import fastifyMultipart from "fastify-multipart"; // https://github.com/fastify/fastify-multipart
+import fastifyHelmet from 'fastify-helmet'; // https://github.com/fastify/fastify-helmet
+import fastifyJwt from 'fastify-jwt'; // https://github.com/fastify/fastify-jwt
+import fastifyRateLimit from 'fastify-rate-limit'; // https://github.com/fastify/fastify-rate-limit
+import fastifySwagger from 'fastify-swagger'; // https://github.com/fastify/fastify-swagger
+import fastifyBlipp from 'fastify-blipp'; // https://github.com/fastify/fastify-blipp
+import fastifyMultipart from 'fastify-multipart'; // https://github.com/fastify/fastify-multipart
 
 // Other
 // import loadHooks from "./hooks/index";
 // import loadDecorators from "./decorators";
 
 // Local
-import loadRoutes from "./routes";
-import "./utils/db";
-import {
-  isProduction,
-  apiUrl,
-  apiPort,
-  currentProtocol
-} from "./utils/helper";
+import loadRoutes from './routes';
+import './utils/db';
+import { isProduction, apiUrl, apiPort, currentProtocol } from './utils/helper';
 
 // Variables
 const fastify = Fastify({
@@ -42,27 +37,27 @@ fastify.register(fastifyJwt, {
 });
 fastify.register(fastifyRateLimit);
 fastify.register(fastifySwagger, {
-  routePrefix: "/api-documentation",
+  routePrefix: '/api-documentation',
   exposeRoute: isProduction === false,
   swagger: {
     info: {
       title: `${process.env.PROJECT_NAME} Documentation`,
-      description: "testing the fastify swagger api",
+      description: 'Swagger api',
       version: process.env.PROJECT_VERSION
     },
     externalDocs: {
-      url: "https://swagger.io",
-      description: "Find more info here"
+      url: 'https://swagger.io',
+      description: 'Find more info here'
     },
-    host: apiUrl.toString().replace("http://", ""),
+    host: apiUrl.toString().replace('http://', ''),
     schemes: [currentProtocol],
-    consumes: ["application/json"],
-    produces: ["application/json"],
+    consumes: ['application/json'],
+    produces: ['application/json'],
     securityDefinitions: {
       Authorization: {
-        type: "Authorization",
-        name: "Authorization",
-        in: "header"
+        type: 'Authorization',
+        name: 'Authorization',
+        in: 'header'
       }
     }
   }
@@ -75,7 +70,7 @@ loadRoutes(fastify);
 // Start Server
 const start = async () => {
   try {
-    await fastify.listen(apiPort, "0.0.0.0");
+    await fastify.listen(apiPort, '0.0.0.0');
     fastify.blipp();
   } catch (err) {
     fastify.log.error(err);
@@ -84,7 +79,7 @@ const start = async () => {
 };
 start();
 
-process.on("unhandledRejection", error => {
+process.on('unhandledRejection', error => {
   // Will print "unhandledRejection err is not defined"
-  console.log("unhandledRejection", error.message);
+  console.log('unhandledRejection', error.message);
 });

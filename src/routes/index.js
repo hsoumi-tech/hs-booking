@@ -13,25 +13,24 @@ export default fastify => {
     };
   });
   fastify.register(roomType, {
-    prefix: 'hotel'
+    prefix: 'room-types'
   });
   fastify.register(bedType, {
-    prefix: 'hotel'
+    prefix: 'bed-types'
   });
   fastify.register(room, {
-    prefix: 'hotel'
+    prefix: 'rooms'
   });
   fastify.register(hotel, {
-    prefix: 'hotel'
+    prefix: 'hotels'
   });
   fastify.register(reservation, {
-    prefix: 'reservation'
+    prefix: 'reservations'
   });
   fastify.register(service, {
-    prefix: 'reservation'
+    prefix: 'services'
   });
   fastify.register(pricePolicy, {
-    prefix: 'reservation'
+    prefix: 'price-policies'
   });
-
 };

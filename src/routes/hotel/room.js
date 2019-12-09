@@ -1,32 +1,19 @@
-import {
-  getAllRooms,
-  addRoom,
-  getRoomById,
-  updateRoom,
-  deleteRoom
-} from '../../controllers/hotel';
+import { getAllRooms, addRoom, getRoomById, updateRoom, deleteRoom } from '../../controllers/hotel';
 
 export default (fastify, opts, next) => {
-
-  // get all room 
-  fastify.get(
-    '/room',
-    async () => {
-      const result = await getAllRooms();
-      return result;
-    }
-  );
+  // get all room
+  fastify.get('/', async () => {
+    const result = await getAllRooms();
+    return result;
+  });
 
   // get room by id
-  fastify.get(
-    '/room/:id',
-    async req => {
-      const result = await getRoomById(req.params.id);
-      return result;
-    }
-  );
+  fastify.get('/:id', async req => {
+    const result = await getRoomById(req.params.id);
+    return result;
+  });
 
-  // add room 
+  // add room
   const addRoomSchema = {
     body: {
       type: 'object',
@@ -63,7 +50,8 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/room', {
+    '/',
+    {
       schema: addRoomSchema
     },
     async req => {
@@ -72,7 +60,7 @@ export default (fastify, opts, next) => {
     }
   );
 
-  // update room 
+  // update room
   const updateRoomSchema = {
     body: {
       type: 'object',
@@ -108,24 +96,24 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/room/:id', {
+    '/:id',
+    {
       schema: updateRoomSchema
     },
     async req => {
-      const result = await updateRoom(Object.assign({}, req.body, {
-        id: req.params.id
-      }));
+      const result = await updateRoom(
+        Object.assign({}, req.body, {
+          id: req.params.id
+        })
+      );
       return result;
     }
   );
 
-  // delete room 
-  fastify.delete(
-    '/room/:id',
-    async req => {
-      const result = await deleteRoom(req.params.id);
-      return result;
-    }
-  );
+  // delete room
+  fastify.delete('/:id', async req => {
+    const result = await deleteRoom(req.params.id);
+    return result;
+  });
   next();
 };

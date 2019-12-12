@@ -12,13 +12,11 @@ export default (fastify, opts, next) => {
     const result = await getAllServices();
     return result;
   });
-
   // get service by id
   fastify.get('/:id', async req => {
     const result = await getServiceById(req.params.id);
     return result;
   });
-
   // add service
   const addServiceSchema = {
     body: {
@@ -48,8 +46,7 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/',
-    {
+    '/', {
       schema: addServiceSchema
     },
     async req => {
@@ -87,8 +84,7 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/:id',
-    {
+    '/:id', {
       schema: updateServiceSchema
     },
     async req => {

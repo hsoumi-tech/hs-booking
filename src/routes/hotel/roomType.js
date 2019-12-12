@@ -1,14 +1,24 @@
-import { getAllRoomTypes, addRoomType, getRoomTypeById, updateRoomType, deleteRoomType } from '../../controllers/hotel';
+import {
+  getAllRoomTypes,
+  addRoomType,
+  getRoomTypeById,
+  updateRoomType,
+  deleteRoomType
+} from '../../controllers/hotel';
 
 export default (fastify, opts, next) => {
   // get all room type
-  fastify.get('/', async () => {
+  fastify.get('/', {
+    preHandler: fastify.verifyJwt
+  }, async () => {
     const result = await getAllRoomTypes();
     return result;
   });
 
   // get room type by id
-  fastify.get('/:id', async req => {
+  fastify.get('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await getRoomTypeById(req.params.id);
     return result;
   });
@@ -30,9 +40,9 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/',
-    {
-      schema: addRoomTypeSchema
+    '/', {
+      schema: addRoomTypeSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       const result = await addRoomType(req.body);
@@ -57,9 +67,9 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/:id',
-    {
-      schema: updateRoomTypeSchema
+    '/:id', {
+      schema: updateRoomTypeSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       const result = await updateRoomType(
@@ -72,7 +82,9 @@ export default (fastify, opts, next) => {
   );
 
   // delete room type
-  fastify.delete('/:id', async req => {
+  fastify.delete('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await deleteRoomType(req.params.id);
     return result;
   });

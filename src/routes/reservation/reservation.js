@@ -6,30 +6,25 @@ import {
   deleteReservation
 } from '../../controllers/reservation';
 
-export default (fastify, opts, next) => {
+import sendMail from '../../utils/sendMail';
 
-  // get all reservation 
-  fastify.get(
-    '/',
-    async () => {
-      const result = await getAllReservations();
-      return result;
-    }
-  );
+export default (fastify, opts, next) => {
+  // get all reservation
+  fastify.get('/', async () => {
+    const result = await getAllReservations();
+    return result;
+  });
 
   // get reservation by id
-  fastify.get(
-    '/:id',
-    async req => {
-      const result = await getReservationById(req.params.id);
-      return result;
-    }
-  );
+  fastify.get('/:id', async req => {
+    const result = await getReservationById(req.params.id);
+    return result;
+  });
 
   const addReservationSchema = {
     body: {
       type: 'object',
-      required: ['room', 'price', 'startDate', 'endDate'],
+      required: ['room', 'startDate', 'endDate'],
       properties: {
         room: {
           type: 'string'
@@ -40,17 +35,11 @@ export default (fastify, opts, next) => {
             type: 'string'
           }
         },
-        price: {
-          type: 'number',
-          minimum: 0
-        },
         startDate: {
-          type: 'string',
-
+          type: 'string'
         },
         endDate: {
-          type: 'string',
-
+          type: 'string'
         },
         adults: {
           type: 'number',
@@ -74,10 +63,18 @@ export default (fastify, opts, next) => {
     },
     async req => {
       const result = await addReservation(req.body);
+      if (result.reservation) {
+        console.log("result", result.reservation)
+        await sendMail({
+          to: 'mahdi.hsoumi@hstech.tn',
+          subject: 'HS BOOKING',
+          html: `New Reservation: ${result.reservation}`
+        });
+      }
       return result;
     }
   );
-  // update reservation 
+  // update reservation
   // const updateReservationSchema = {
   //   body: {
   //     type: 'object',
@@ -132,13 +129,10 @@ export default (fastify, opts, next) => {
   //   }
   // );
 
-  // delete reservation 
-  fastify.delete(
-    '/:id',
-    async req => {
-      const result = await deleteReservation(req.params.id);
-      return result;
-    }
-  );
+  // delete reservation
+  fastify.delete('/:id', async req => {
+    const result = await deleteReservation(req.params.id);
+    return result;
+  });
   next();
 };

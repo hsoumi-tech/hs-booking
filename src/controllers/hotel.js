@@ -3,7 +3,9 @@ import RoomType from '../models/roomType'
 import BedType from '../models/bedType'
 import Room from '../models/room'
 import Hotel from '../models/hotel'
-
+import PricePolicy from '../models/pricePolicy';
+import Reservation from '../models/reservation';
+import Service from '../models/service';
 
 // ###############################################################################
 // ### room type
@@ -82,15 +84,15 @@ export const deleteRoomType = async (id) => {
 // ### bed type
 // ###############################################################################
 
-export const getBedTypeById = async (id) => {
-  if (mongoose.Types.ObjectId.isValid(id) === false) {
+export const getBedTypeById = async (bedTypeId) => {
+  if (mongoose.Types.ObjectId.isValid(bedTypeId) === false) {
     return {
       code: 422,
       message: 'invalid bed type id'
     };
   }
   return BedType.findOne({
-    _id: id
+    _id: bedTypeId
   })
 };
 
@@ -112,11 +114,11 @@ export const addBedType = async ({
 };
 
 
-export const updateBedType = async ({
+export const updateBedType = async (id, {
   name,
   description,
   size,
-  id
+
 }) => {
   if (mongoose.Types.ObjectId.isValid(id) === false) {
     return {
@@ -340,6 +342,10 @@ export const deleteRoom = async (id) => {
       message: 'invalid room id'
     };
   }
+  
+  await Reservation.deleteMany({
+    room: id
+  })
   return Room.findOneAndDelete({
     _id: id
   })
@@ -426,7 +432,79 @@ export const deleteHotel = async (id) => {
       message: 'invalid hotel id'
     };
   }
-  return Hotel.findOneAndDelete({
+  const hotel = await Hotel.findOne({
+    _id:id
+  })
+  if (!hotel) {
+    return {
+      code: 404,
+      message: "hotel not found"
+    }
+  }
+
+
+  let rommsId = []
+  const rooms = await Room.find({
+    hotel: hotel.id
+  })
+  await rooms.forEach(element => {
+    rommsId.push(element._id)
+  });
+
+  console.log("rommsId",rommsId)
+
+  // delete all reservation related to room of hotel
+  console.log("rommsId reservations delete",await Reservation.deleteMany({
+    room: {
+      $in: rommsId
+    }
+  }))
+  
+
+ // delete all rooms related to hotel
+ console.log("romms delete", await Room.deleteMany({
+  _id: {
+    $in: rommsId
+  }
+}))
+ 
+  let servicesId = []
+  const services = await Service.find({
+    hotel: hotel.id
+  })
+
+  services.forEach(element => {
+    servicesId.push(element._id)
+  });
+
+  console.log("servicesId",servicesId)
+
+  // delete all reservation related to services of hotel
+  
+  console.log("servicesId reservations delete",await Reservation.deleteMany({
+    services: {
+      $elemMatch: {
+        $in: servicesId
+      }
+    }
+  }))
+  
+  // delete all Services related to the hotel
+ console.log("Services delete",  await Service.deleteMany({
+  _id: {
+    $in: servicesId
+  }
+}))
+
+  // delete all Price Policies related to the hotel
+  console.log("delete price policy",  await PricePolicy.deleteMany({
+    hotel: hotel.id
+  }))
+ 
+  // delete the hotel
+  const deleteHotel= await Hotel.findOneAndDelete({
     _id: id
   })
+  console.log("deleteHotel",deleteHotel)
+  return deleteHotel
 };

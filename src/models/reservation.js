@@ -26,6 +26,9 @@ const reservationSchema = new Schema({
   babies: {
     type: Number,
     default: 0
+  },
+  email: {
+    type: String
   }
 }, {
   timestamps: true

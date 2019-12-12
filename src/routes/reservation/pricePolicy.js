@@ -14,7 +14,9 @@ export default (fastify, opts, next) => {
   });
 
   // get price policy by id
-  fastify.get('/:id', async req => {
+  fastify.get('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await getPricePolicyById(req.params.id);
     return result;
   });
@@ -37,7 +39,8 @@ export default (fastify, opts, next) => {
         },
         dayOfTheWeek: {
           type: 'number',
-          minimum: 0
+          minimum: 0,
+          maximum: 6,
         },
         days: {
           type: 'array',
@@ -54,9 +57,9 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/',
-    {
-      schema: addPricePolicySchema
+    '/', {
+      schema: addPricePolicySchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       const result = await addPricePolicy(req.body);
@@ -78,11 +81,13 @@ export default (fastify, opts, next) => {
         },
         maximumPerson: {
           type: 'number',
-          minimum: 1
+          minimum: 1,
+
         },
         dayOfTheWeek: {
           type: 'number',
-          minimum: 0
+          minimum: 0,
+          maximum: 6,
         },
         days: {
           type: 'array',
@@ -99,9 +104,9 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/:id',
-    {
-      schema: updatePricePolicySchema
+    '/:id', {
+      schema: updatePricePolicySchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       // const result = await updatePricePolicy(Object.assign({}, req.body, {
@@ -117,7 +122,9 @@ export default (fastify, opts, next) => {
   );
 
   // delete price policy
-  fastify.delete('/:id', async req => {
+  fastify.delete('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await deletePricePolicy(req.params.id);
     return result;
   });

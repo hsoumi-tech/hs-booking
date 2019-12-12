@@ -9,13 +9,18 @@ import fastifyBlipp from 'fastify-blipp'; // https://github.com/fastify/fastify-
 import fastifyMultipart from 'fastify-multipart'; // https://github.com/fastify/fastify-multipart
 
 // Other
-// import loadHooks from "./hooks/index";
-// import loadDecorators from "./decorators";
+import loadHooks from "./hooks/index";
+import loadDecorators from "./decorators";
 
 // Local
 import loadRoutes from './routes';
 import './utils/db';
-import { isProduction, apiUrl, apiPort, currentProtocol } from './utils/helper';
+import {
+  isProduction,
+  apiUrl,
+  apiPort,
+  currentProtocol
+} from './utils/helper';
 
 // Variables
 const fastify = Fastify({
@@ -28,6 +33,10 @@ const fastify = Fastify({
     }
   }
 });
+
+// Load hooks
+loadHooks(fastify);
+loadDecorators(fastify);
 
 // Load Plugins
 fastify.register(fastifyBlipp);
@@ -54,8 +63,8 @@ fastify.register(fastifySwagger, {
     consumes: ['application/json'],
     produces: ['application/json'],
     securityDefinitions: {
-      Authorization: {
-        type: 'Authorization',
+      jwt: {
+        type: 'apiKey',
         name: 'Authorization',
         in: 'header'
       }

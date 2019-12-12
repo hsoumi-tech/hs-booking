@@ -78,24 +78,70 @@ export const addReservation = async ({
             code: 404,
             message: "service not found in this hotel"
           };
+        } else {
+          const diffDays = Math.abs(moment().diff(startDate, "days"));
+          if (service.daysBeforeReservation > diffDays) {
+            return {
+              code: 422,
+              message: `the service: "${service.name}" must be reserved before "${service.daysBeforeReservation}" days of your reservation`
+            };
+          }
+          const id = service._id
+          const serviceReservations = await Reservation.find({
+            services: {
+              $elemMatch: {
+                $eq: id
+              }
+            },
+            $or: [{
+                startDate: {
+                  $lte: startDate.toDate()
+                },
+                endDate: {
+                  $gte: startDate.toDate()
+                }
+              }, {
+                startDate: {
+                  $gte: startDate.toDate()
+                },
+                endDate: {
+                  $lte: endDate.toDate()
+                }
+              }, {
+                startDate: {
+                  $lte: endDate.toDate()
+                },
+                endDate: {
+                  $gte: endDate.toDate()
+                }
+              },
+              {
+                startDate: {
+                  $lte: startDate.toDate()
+                },
+                endDate: {
+                  $gte: endDate.toDate()
+                }
+              }
+            ]
+          });
+          const serviceDemanded = 0
+          services.forEach(s => {
+            if (service._id == s._id) serviceDemanded++
+          });
+          if (serviceReservations.length > service.quantity || serviceDemanded > service.quantity) {
+            return {
+              code: 422,
+              message: `the service is not available`
+            };
+          }
+
+          serviceTotalPrice += service.price
+
         }
       }
 
-      const diffDays = Math.abs(moment().diff(startDate, "days"));
-      if (services[i].daysBeforeReservation > diffDays) {
-        return {
-          code: 422,
-          message: `the service: "${services[i].name}" must be reserved before "${services[i].daysBeforeReservation}" days of your reservation`
-        };
-      }
-      serviceTotalPrice += services.price
 
-      // if (services[i].quantity) {
-      //   return {
-      //     code: 422,
-      //     message: `the service: "${services[i].name}" must be reserved before "${services[i].daysBeforeReservation}" days of your reservation`
-      //   };
-      // }
     }
   }
 
@@ -150,16 +196,19 @@ export const addReservation = async ({
   }
 
   finalPrice += serviceTotalPrice
-  return new Reservation({
-    room,
-    services,
-    price: finalPrice,
-    startDate,
-    endDate,
-    adults,
-    kids,
-    babies
-  }).save();
+  return {
+    code: 200,
+    reservation: await new Reservation({
+      room,
+      services,
+      price: finalPrice,
+      startDate,
+      endDate,
+      adults,
+      kids,
+      babies
+    }).save()
+  }
 };
 
 // export const updateReservation = async ({
@@ -376,12 +425,14 @@ export const updateService = async ({
 };
 
 export const deleteService = async id => {
+  
   if (mongoose.Types.ObjectId.isValid(id) === false) {
     return {
       code: 422,
       message: "invalid service id"
     };
   }
+
   return Service.findOneAndDelete({
     _id: id
   });
@@ -430,6 +481,35 @@ export const addPricePolicy = async ({
       message: "hotel not found"
     };
   }
+
+  const pricePolicyExist = await PricePolicy.findOne({
+    hotel,
+    $or: [{
+        dayOfTheWeek: dayOfTheWeek
+      },
+      {
+        $and: [{
+            days: {
+              $in: days
+            }
+          },
+          {
+            days: {
+              $ne: null
+            },
+          }
+        ]
+      }
+    ]
+  })
+  console.log(pricePolicyExist)
+  if (pricePolicyExist) {
+    return {
+      code: 409,
+      message: "offer allready exists"
+    }
+  }
+
 
   return new PricePolicy({
     name,

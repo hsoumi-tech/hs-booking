@@ -10,8 +10,9 @@ export default (fastify, opts, next) => {
 
   // get all hotel 
   fastify.get(
-    '/',
-    async () => {
+    '/', {
+      preHandler: fastify.verifyJwt
+    }, async () => {
       const result = await getAllHotels();
       return result;
     }
@@ -19,7 +20,9 @@ export default (fastify, opts, next) => {
 
   // get hotel by id
   fastify.get(
-    '/:id',
+    '/:id', {
+      preHandler: fastify.verifyJwt
+    },
     async req => {
       const result = await getHotelById(req.params.id);
       return result;
@@ -50,7 +53,8 @@ export default (fastify, opts, next) => {
 
   fastify.post(
     '/', {
-      schema: addHotelSchema
+      schema: addHotelSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       const result = await addHotel(req.body);
@@ -82,7 +86,8 @@ export default (fastify, opts, next) => {
 
   fastify.put(
     '/:id', {
-      schema: updateHotelSchema
+      schema: updateHotelSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
       const result = await updateHotel(Object.assign({}, req.body, {
@@ -94,7 +99,9 @@ export default (fastify, opts, next) => {
 
   // delete hotel 
   fastify.delete(
-    '/:id',
+    '/:id', {
+      preHandler: fastify.verifyJwt
+    },
     async req => {
       const result = await deleteHotel(req.params.id);
       return result;

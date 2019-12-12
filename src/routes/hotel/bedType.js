@@ -1,15 +1,25 @@
-import { getAllBedTypes, addBedType, getBedTypeById, updateBedType, deleteBedType } from '../../controllers/hotel';
+import {
+  getAllBedTypes,
+  addBedType,
+  getBedTypeById,
+  updateBedType,
+  deleteBedType
+} from '../../controllers/hotel';
 
 export default (fastify, opts, next) => {
   // get all bed type
-  fastify.get('/', async () => {
+  fastify.get('/', {
+    preHandler: fastify.verifyJwt
+  }, async () => {
     const result = await getAllBedTypes();
     return result;
   });
 
   // get bed type by id
-  fastify.get('/:id', async req => {
-    const result = await getBedTypeById(req.params.id);
+  fastify.get('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
+    const result = await getBedTypeById(req.jwtData.id, req.params.id);
     return result;
   });
 
@@ -34,12 +44,12 @@ export default (fastify, opts, next) => {
   };
 
   fastify.post(
-    '/',
-    {
-      schema: addBedTypeSchema
+    '/', {
+      schema: addBedTypeSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
-      const result = await addBedType(req.body);
+      const result = await addBedType(req.jwtData.id, req.body);
       return result;
     }
   );
@@ -65,22 +75,21 @@ export default (fastify, opts, next) => {
   };
 
   fastify.put(
-    '/:id',
-    {
-      schema: updateBedTypeSchema
+    '/:id', {
+      schema: updateBedTypeSchema,
+      preHandler: fastify.verifyJwt
     },
     async req => {
-      const result = await updateBedType(
-        Object.assign({}, req.body, {
-          id: req.params.id
-        })
-      );
+      const result = await updateBedType(req.params.id, req.body)
+
       return result;
     }
   );
 
   // delete bed type
-  fastify.delete('/:id', async req => {
+  fastify.delete('/:id', {
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await deleteBedType(req.params.id);
     return result;
   });

@@ -5,12 +5,21 @@ import hotel from './hotel/hotel';
 import reservation from './reservation/reservation';
 import service from './reservation/service';
 import pricePolicy from './reservation/pricePolicy';
+import Moderator from '../models/moderator';
+import moderators from './moderator/moderator';
+import bcrypt from 'bcrypt';
 
 export default fastify => {
-  fastify.get('/', async (req, res) => {
-    return {
-      welcome: 'api'
-    };
+  fastify.ready(async () => {
+    const moderator = await Moderator.findOne({
+      name: process.env.ROOT_MODERATOR_NAME
+    })
+    if (!moderator) {
+      new Moderator({
+        name: process.env.ROOT_MODERATOR_PASSWORD,
+        password: bcrypt.hashSync(process.env.ROOT_MODERATOR_PASSWORD, 10)
+      }).save()
+    }
   });
   fastify.register(roomType, {
     prefix: 'room-types'
@@ -32,5 +41,8 @@ export default fastify => {
   });
   fastify.register(pricePolicy, {
     prefix: 'price-policies'
+  });
+  fastify.register(moderators, {
+    prefix: 'moderator'
   });
 };

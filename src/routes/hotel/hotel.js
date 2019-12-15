@@ -11,6 +11,12 @@ export default (fastify, opts, next) => {
   // get all hotel 
   fastify.get(
     '/', {
+      schema: {
+        security: [{
+          jwt: []
+        }],
+
+      },
       preHandler: fastify.verifyJwt
     }, async () => {
       const result = await getAllHotels();
@@ -21,6 +27,20 @@ export default (fastify, opts, next) => {
   // get hotel by id
   fastify.get(
     '/:id', {
+      schema: {
+        security: [{
+          jwt: []
+        }],
+        params: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {
+              type: 'string'
+            }
+          }
+        },
+      },
       preHandler: fastify.verifyJwt
     },
     async req => {
@@ -31,6 +51,9 @@ export default (fastify, opts, next) => {
 
   // add hotel 
   const addHotelSchema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
       required: ['name', 'description', 'adress', 'phoneNumber'],
@@ -64,6 +87,18 @@ export default (fastify, opts, next) => {
 
   // update hotel 
   const updateHotelSchema = {
+    security: [{
+      jwt: []
+    }],
+    params: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: {
+          type: 'string'
+        }
+      }
+    },
     body: {
       type: 'object',
       required: [],
@@ -100,6 +135,20 @@ export default (fastify, opts, next) => {
   // delete hotel 
   fastify.delete(
     '/:id', {
+      schema: {
+        security: [{
+          jwt: []
+        }],
+        params: {
+          type: 'object',
+          required: ['id'],
+          properties: {
+            id: {
+              type: 'string'
+            }
+          }
+        },
+      },
       preHandler: fastify.verifyJwt
     },
     async req => {

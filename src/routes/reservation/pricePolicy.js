@@ -8,13 +8,34 @@ import {
 
 export default (fastify, opts, next) => {
   // get all Price Policies
-  fastify.get('/', async () => {
+  fastify.get('/', {
+    schema: {
+      security: [{
+        jwt: []
+      }]
+    },
+    preHandler: fastify.verifyJwt
+  }, async () => {
     const result = await getAllPricePolicies();
     return result;
   });
 
   // get price policy by id
   fastify.get('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
     preHandler: fastify.verifyJwt
   }, async req => {
     const result = await getPricePolicyById(req.params.id);
@@ -23,6 +44,9 @@ export default (fastify, opts, next) => {
 
   // add price policy
   const addPricePolicySchema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
       required: ['name', 'value', 'hotel'],
@@ -69,6 +93,18 @@ export default (fastify, opts, next) => {
 
   // update price policy
   const updatePricePolicySchema = {
+    security: [{
+      jwt: []
+    }],
+    params: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: {
+          type: 'string'
+        }
+      }
+    },
     body: {
       type: 'object',
       required: [],
@@ -123,6 +159,20 @@ export default (fastify, opts, next) => {
 
   // delete price policy
   fastify.delete('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
     preHandler: fastify.verifyJwt
   }, async req => {
     const result = await deletePricePolicy(req.params.id);

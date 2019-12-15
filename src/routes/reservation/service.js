@@ -8,17 +8,44 @@ import {
 
 export default (fastify, opts, next) => {
   // get all services
-  fastify.get('/', async () => {
+  fastify.get('/', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+
+    },
+    preHandler: fastify.verifyJwt
+  }, async () => {
     const result = await getAllServices();
     return result;
   });
   // get service by id
-  fastify.get('/:id', async req => {
+  fastify.get('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await getServiceById(req.params.id);
     return result;
   });
   // add service
   const addServiceSchema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
       required: ['name', 'price', 'hotel'],
@@ -57,6 +84,18 @@ export default (fastify, opts, next) => {
 
   // update service
   const updateServiceSchema = {
+    security: [{
+      jwt: []
+    }],
+    params: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: {
+          type: 'string'
+        }
+      }
+    },
     body: {
       type: 'object',
       required: [],
@@ -98,7 +137,23 @@ export default (fastify, opts, next) => {
   );
 
   // delete service
-  fastify.delete('/:id', async req => {
+  fastify.delete('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await deleteService(req.params.id);
     return result;
   });

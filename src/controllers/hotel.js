@@ -75,6 +75,15 @@ export const deleteRoomType = async (id) => {
       message: 'invalid room type id'
     };
   }
+  const roomTypeUsed = await Room.find({
+    roomType: id
+  })
+  if (roomTypeUsed && roomTypeUsed.length > 0) {
+    return {
+      message: "room type is already used",
+      rooms: roomTypeUsed
+    }
+  }
   return RoomType.findOneAndDelete({
     _id: id
   })
@@ -151,6 +160,20 @@ export const deleteBedType = async (id) => {
       code: 422,
       message: 'invalid bed type id'
     };
+  }
+
+  const bedTypeUsed = await Room.find({
+    beds: {
+      $elemMatch: {
+        $eq: id
+      }
+    }
+  })
+  if (bedTypeUsed && bedTypeUsed.length > 0) {
+    return {
+      message: "bed type is already used",
+      rooms: bedTypeUsed
+    }
   }
   return BedType.findOneAndDelete({
     _id: id
@@ -342,10 +365,17 @@ export const deleteRoom = async (id) => {
       message: 'invalid room id'
     };
   }
-  
-  await Reservation.deleteMany({
+
+  const roomUsed = await Reservation.find({
     room: id
   })
+  if (roomUsed && roomUsed.length > 0) {
+    return {
+      message: "room is already used",
+      rooms: roomUsed
+    }
+  }
+
   return Room.findOneAndDelete({
     _id: id
   })
@@ -433,7 +463,7 @@ export const deleteHotel = async (id) => {
     };
   }
   const hotel = await Hotel.findOne({
-    _id:id
+    _id: id
   })
   if (!hotel) {
     return {
@@ -451,23 +481,23 @@ export const deleteHotel = async (id) => {
     rommsId.push(element._id)
   });
 
-  console.log("rommsId",rommsId)
+  console.log("rommsId", rommsId)
 
   // delete all reservation related to room of hotel
-  console.log("rommsId reservations delete",await Reservation.deleteMany({
+  console.log("rommsId reservations delete", await Reservation.deleteMany({
     room: {
       $in: rommsId
     }
   }))
-  
 
- // delete all rooms related to hotel
- console.log("romms delete", await Room.deleteMany({
-  _id: {
-    $in: rommsId
-  }
-}))
- 
+
+  // delete all rooms related to hotel
+  console.log("romms delete", await Room.deleteMany({
+    _id: {
+      $in: rommsId
+    }
+  }))
+
   let servicesId = []
   const services = await Service.find({
     hotel: hotel.id
@@ -477,34 +507,34 @@ export const deleteHotel = async (id) => {
     servicesId.push(element._id)
   });
 
-  console.log("servicesId",servicesId)
+  console.log("servicesId", servicesId)
 
   // delete all reservation related to services of hotel
-  
-  console.log("servicesId reservations delete",await Reservation.deleteMany({
+
+  console.log("servicesId reservations delete", await Reservation.deleteMany({
     services: {
       $elemMatch: {
         $in: servicesId
       }
     }
   }))
-  
+
   // delete all Services related to the hotel
- console.log("Services delete",  await Service.deleteMany({
-  _id: {
-    $in: servicesId
-  }
-}))
+  console.log("Services delete", await Service.deleteMany({
+    _id: {
+      $in: servicesId
+    }
+  }))
 
   // delete all Price Policies related to the hotel
-  console.log("delete price policy",  await PricePolicy.deleteMany({
+  console.log("delete price policy", await PricePolicy.deleteMany({
     hotel: hotel.id
   }))
- 
+
   // delete the hotel
-  const deleteHotel= await Hotel.findOneAndDelete({
+  const deleteHotel = await Hotel.findOneAndDelete({
     _id: id
   })
-  console.log("deleteHotel",deleteHotel)
+  console.log("deleteHotel", deleteHotel)
   return deleteHotel
 };

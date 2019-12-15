@@ -6,6 +6,9 @@ import {
 export default (fastify, opts, next) => {
   // add bed type
   const schema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
       required: ['name', 'password'],

@@ -9,6 +9,11 @@ import {
 export default (fastify, opts, next) => {
   // get all room type
   fastify.get('/', {
+    schema: {
+      security: [{
+        jwt: []
+      }]
+    },
     preHandler: fastify.verifyJwt
   }, async () => {
     const result = await getAllRoomTypes();
@@ -17,6 +22,20 @@ export default (fastify, opts, next) => {
 
   // get room type by id
   fastify.get('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
     preHandler: fastify.verifyJwt
   }, async req => {
     const result = await getRoomTypeById(req.params.id);
@@ -25,6 +44,9 @@ export default (fastify, opts, next) => {
 
   // add room type
   const addRoomTypeSchema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
       required: ['name', 'description'],
@@ -52,6 +74,18 @@ export default (fastify, opts, next) => {
 
   // update room type
   const updateRoomTypeSchema = {
+    security: [{
+      jwt: []
+    }],
+    params: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: {
+          type: 'string'
+        }
+      }
+    },
     body: {
       type: 'object',
       required: [],
@@ -83,6 +117,20 @@ export default (fastify, opts, next) => {
 
   // delete room type
   fastify.delete('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
     preHandler: fastify.verifyJwt
   }, async req => {
     const result = await deleteRoomType(req.params.id);

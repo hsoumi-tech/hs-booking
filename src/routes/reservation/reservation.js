@@ -5,26 +5,51 @@ import {
   // updateReservation,
   deleteReservation
 } from '../../controllers/reservation';
-
 import sendMail from '../../utils/sendMail';
-
+import moment from 'moment'
 export default (fastify, opts, next) => {
   // get all reservation
-  fastify.get('/', async () => {
+  fastify.get('/', {
+    schema: {
+      security: [{
+        jwt: []
+      }]
+    },
+    preHandler: fastify.verifyJwt
+  }, async () => {
     const result = await getAllReservations();
     return result;
   });
 
   // get reservation by id
-  fastify.get('/:id', async req => {
+  fastify.get('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await getReservationById(req.params.id);
     return result;
   });
 
   const addReservationSchema = {
+    security: [{
+      jwt: []
+    }],
     body: {
       type: 'object',
-      required: ['room', 'startDate', 'endDate'],
+      required: ['room', 'startDate', 'endDate', 'email'],
       properties: {
         room: {
           type: 'string'
@@ -52,6 +77,10 @@ export default (fastify, opts, next) => {
         babies: {
           type: 'number',
           minimum: 0
+        },
+        email: {
+          type: 'string',
+          format: 'email'
         }
       }
     }
@@ -64,11 +93,12 @@ export default (fastify, opts, next) => {
     async req => {
       const result = await addReservation(req.body);
       if (result.reservation) {
-        console.log("result", result.reservation)
         await sendMail({
-          to: 'mahdi.hsoumi@hstech.tn',
-          subject: 'HS BOOKING',
-          html: `New Reservation: ${result.reservation}`
+          to: result.reservation.email,
+          subject: `Reply from ${result.hotelName}`,
+          html: `Your reservation: <br>
+           Room number: ${result.room.roomNumber}<br> Floor Level: ${result.room.floorLevel}<br>
+           Check in: ${moment(result.reservation.startDate).format("YYYY-MM-DD")} <br> Check out: ${moment(result.reservation.endDate).format("YYYY-MM-DD")}`
         });
       }
       return result;
@@ -130,7 +160,23 @@ export default (fastify, opts, next) => {
   // );
 
   // delete reservation
-  fastify.delete('/:id', async req => {
+  fastify.delete('/:id', {
+    schema: {
+      security: [{
+        jwt: []
+      }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+    },
+    preHandler: fastify.verifyJwt
+  }, async req => {
     const result = await deleteReservation(req.params.id);
     return result;
   });

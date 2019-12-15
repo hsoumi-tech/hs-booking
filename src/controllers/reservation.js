@@ -33,9 +33,10 @@ export const addReservation = async ({
   endDate,
   adults = 1,
   kids = 0,
-  babies = 0
+  babies = 0,
+  email
 }) => {
-  let roomPopulated = "";
+  let roomPopulated = {};
   if (mongoose.Types.ObjectId.isValid(room) === false) {
     return {
       code: 422,
@@ -44,7 +45,8 @@ export const addReservation = async ({
   } else {
     roomPopulated = await Room.findOne({
       _id: room
-    });
+    }).populate('hotel');
+
 
     if (!roomPopulated) {
       return {
@@ -54,8 +56,22 @@ export const addReservation = async ({
     }
   }
 
+
   startDate = moment(startDate, "DD/MM/YYYY");
   endDate = moment(endDate, "DD/MM/YYYY");
+
+  if (endDate.diff(startDate, 'days') < 1) {
+    return {
+      code: 422,
+      message: "end date should be after start date"
+    };
+  }
+  if (startDate.isBefore(moment())) {
+    return {
+      code: 422,
+      message: "start date should be after today or today"
+    };
+  }
   let serviceTotalPrice = 0;
   if (services) {
     for (let i = 0; i < services.length; i++) {
@@ -73,7 +89,7 @@ export const addReservation = async ({
             code: 404,
             message: "service not found"
           };
-        } else if (!service.hotel.equals(roomPopulated.hotel)) {
+        } else if (!service.hotel.equals(roomPopulated.hotel._id)) {
           return {
             code: 404,
             message: "service not found in this hotel"
@@ -198,6 +214,8 @@ export const addReservation = async ({
   finalPrice += serviceTotalPrice
   return {
     code: 200,
+    room: roomPopulated,
+    hotelName: roomPopulated.hotel.name,
     reservation: await new Reservation({
       room,
       services,
@@ -206,7 +224,8 @@ export const addReservation = async ({
       endDate,
       adults,
       kids,
-      babies
+      babies,
+      email
     }).save()
   }
 };
@@ -425,14 +444,26 @@ export const updateService = async ({
 };
 
 export const deleteService = async id => {
-  
+
   if (mongoose.Types.ObjectId.isValid(id) === false) {
     return {
       code: 422,
       message: "invalid service id"
     };
   }
-
+  const serviceUsed = await Reservation.find({
+    services: {
+      $elemMatch: {
+        $eq: id
+      }
+    }
+  })
+  if (serviceUsed && serviceUsed.length > 0) {
+    return {
+      message: "service is already used",
+      service: serviceUsed
+    }
+  }
   return Service.findOneAndDelete({
     _id: id
   });

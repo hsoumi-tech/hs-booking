@@ -21,7 +21,7 @@
     "fastify-blipp": "^2.1.0",
     "fastify-helmet": "^3.0.2",
     "fastify-jwt": "^1.2.0",
-    "fastify-multipart": "^1.0.3",
+    "fastify-multipart": "^1.0.5",
     "fastify-rate-limit": "^3.0.0",
     "fastify-swagger": "^2.5.0",
     "moment": "^2.24.0",
